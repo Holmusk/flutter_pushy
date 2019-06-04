@@ -6,7 +6,13 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.media.RingtoneManager;
 import android.graphics.Color;
@@ -21,16 +27,20 @@ import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import me.pushy.sdk.Pushy;
 
 /** FlutterPushyPlugin */
-public class FlutterPushyPlugin implements MethodCallHandler {
+public class FlutterPushyPlugin
+  extends BroadcastReceiver
+  implements MethodCallHandler {
   /** Plugin registration. */
   private final MethodChannel channel;
   private final Registrar registrar;
@@ -46,6 +56,24 @@ public class FlutterPushyPlugin implements MethodCallHandler {
     /// on 1st Usage
     plugin.requestWriteExtStoragePermission();
     Pushy.listen(registrar.activeContext());
+  }
+
+  /// Plugin constructor
+  private FlutterPushyPlugin(Registrar registrar, MethodChannel channel) {
+    this.registrar = registrar;
+    this.channel = channel;
+
+    IntentFilter intentFilter = new IntentFilter();
+    intentFilter.addAction(PushReceiver.ACTION_REMOTE_MESSAGE);
+    LocalBroadcastManager manager = LocalBroadcastManager.getInstance(registrar.activeContext());
+    manager.registerReceiver(this, intentFilter);
+  }
+
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    String action = intent.getAction();
+    Log.d("flutter_pushy", action);
+    channel.invokeMethod("onMessage", bundleToMap(intent.getExtras()));
   }
 
   /// Check if wirte external storage permission
@@ -65,12 +93,6 @@ public class FlutterPushyPlugin implements MethodCallHandler {
                                       android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 
                           0);
     }
-  }
-
-  /// Plugin constructor
-  private FlutterPushyPlugin(Registrar registrar, MethodChannel channel) {
-    this.registrar = registrar;
-    this.channel = channel;
   }
 
   /// Method handler
@@ -119,8 +141,6 @@ public class FlutterPushyPlugin implements MethodCallHandler {
   private SharedPreferences getSharedPreferences() {
     return PreferenceManager.getDefaultSharedPreferences(this.registrar.activeContext());
   }
-  
-
 
   /// Register device asynchronous runner
   /// =====================================================================================
@@ -142,4 +162,16 @@ public class FlutterPushyPlugin implements MethodCallHandler {
       channel.invokeMethod("onToken", result);
     }
   }
+
+  public static Map<String, String> bundleToMap(Bundle extras) {
+        Map<String, String> map = new HashMap<String, String>();
+
+        Set<String> ks = extras.keySet();
+        Iterator<String> iterator = ks.iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            map.put(key, extras.getString(key));
+        }//from   www . j  a  v  a  2  s  .co m
+        return map;
+    }
 }

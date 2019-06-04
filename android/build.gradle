@@ -32,7 +32,7 @@ android {
         disable 'InvalidPackage'
     }
     dependencies {
-        implementation 'me.pushy:sdk:1.0.46'
+        implementation 'me.pushy:sdk:1.0.48'
         implementation 'com.android.support:support-v4:20.0.+'
         implementation 'com.android.support:appcompat-v7:23.0.1'
     }

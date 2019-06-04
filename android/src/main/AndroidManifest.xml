@@ -15,9 +15,8 @@
     
     <!-- Pushy Declarations -->
     
-    <receiver android:name="PushReceiver" android:exported="false">
+    <receiver android:name="PushReceiver" android:enabled="true" android:exported="false">
       <intent-filter>
-        <!-- Do not modify this -->
         <action android:name="pushy.me" />
       </intent-filter>
     </receiver>
