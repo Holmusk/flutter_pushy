@@ -20,7 +20,5 @@ public class PushReceiver extends BroadcastReceiver {
         Intent newIntent = new Intent(ACTION_REMOTE_MESSAGE);
         newIntent.putExtras(intent);
         LocalBroadcastManager.getInstance(context).sendBroadcast(newIntent);
-
-        /// HOW TO SHOW NOTIFICATION ????
     }
 }

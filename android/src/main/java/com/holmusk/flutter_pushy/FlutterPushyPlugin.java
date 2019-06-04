@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.NotificationManager;
+import android.app.NotificationChannel;
 
 import android.content.SharedPreferences;
 import android.content.Context;
@@ -69,12 +70,50 @@ public class FlutterPushyPlugin
     manager.registerReceiver(this, intentFilter);
   }
 
+
+
+
   @Override
   public void onReceive(Context context, Intent intent) {
     String action = intent.getAction();
     Log.d("flutter_pushy", action);
     channel.invokeMethod("onMessage", bundleToMap(intent.getExtras()));
+
+    String title = "Notication";
+    String message = "Test Notification";
+    if (intent.getStringExtra("message") != null) {
+      message = intent.getStringExtra("message");
+    }
+
+    int NOTIFICATION_ID = 234;
+    String CHANNEL_ID = "flutter_pushy";
+    
+    NotificationCompat.Builder builder = 
+    new NotificationCompat.Builder(context)
+    .setChannelId(CHANNEL_ID)
+    .setAutoCancel(true)
+    .setSmallIcon(android.R.drawable.ic_dialog_info)
+    .setLights(Color.RED, 1000, 1000)
+    .setVibrate(new long[]{0, 400, 250, 400})
+    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+    .setContentTitle(title)
+    .setContentText(message);
+    // .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, registrar.activity().class), PendingIntent.FLAG_UPDATE_CURRENT));
+
+    Pushy.setNotificationChannel(builder, context);
+
+    NotificationManager manager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+    manager.notify(NOTIFICATION_ID, builder.build());
   }
+
+
+
+
+
+
+
+
+
 
   /// Check if wirte external storage permission
   /// is granted or not
