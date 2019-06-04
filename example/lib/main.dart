@@ -10,11 +10,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-  bool    _isLoading = false;
-  String  _data;
-  String  _token = '';
-  final   _pushy = FlutterPushy();
+  bool _isLoading = false;
+  String _data;
+  String _token = '';
+  final _pushy = FlutterPushy();
 
   @override
   void initState() {
@@ -23,6 +22,9 @@ class _MyAppState extends State<MyApp> {
     _pushy.configure(onMessage: (data) {
       print('DATA: $data');
       setState(() => _data = data.toString());
+    }, onToken: (token) {
+      print('found new Token: $token');
+      setState(() => _token = token);
     });
   }
 
@@ -70,9 +72,9 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Pushy Test'),
         ),
-        body: LocalPlatform().isIOS ? 
-          _iOScontent(context) : 
-          _iAndroidDontent(context),
+        body: LocalPlatform().isIOS
+            ? _iOScontent(context)
+            : _iAndroidDontent(context),
       ),
     );
   }
@@ -121,7 +123,8 @@ class _MyAppState extends State<MyApp> {
                   child: Text('Get write permission'),
                   onPressed: () async {
                     final granted = await _pushy.writeExtStoragePermission;
-                    print('Write external storage permission: ${granted ? 'yes' : 'no'}');
+                    print(
+                        'Write external storage permission: ${granted ? 'yes' : 'no'}');
                   },
                 ),
                 RaisedButton(
