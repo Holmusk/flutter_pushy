@@ -40,5 +40,7 @@
       android:exported="true" />
 
     <!-- End Pushy Declarations -->
+
+
   </application>
 </manifest>

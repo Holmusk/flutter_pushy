@@ -12,7 +12,6 @@ public class PushReceiver extends BroadcastReceiver {
 
     public static final String ACTION_REMOTE_MESSAGE =
         "com.holmusk.plugin.pushymessaging.NOTIFICATION";
-    public static final String EXTRA_REMOTE_MESSAGE = "notification";
 
     @Override
     public void onReceive(Context context, Intent intent) {

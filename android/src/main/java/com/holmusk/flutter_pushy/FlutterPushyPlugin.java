@@ -5,6 +5,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.plugin.common.PluginRegistry.NewIntentListener;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -41,10 +42,12 @@ import me.pushy.sdk.Pushy;
 /** FlutterPushyPlugin */
 public class FlutterPushyPlugin
   extends BroadcastReceiver
-  implements MethodCallHandler {
+  implements MethodCallHandler, NewIntentListener {
   /** Plugin registration. */
   private final MethodChannel channel;
   private final Registrar registrar;
+
+  private static final String CLICK_ACTION_VALUE = "PUSHY_NOTIFICATION_CLICK";
 
   /// Register channel and handler
   public static void registerWith(Registrar registrar) {
@@ -57,6 +60,8 @@ public class FlutterPushyPlugin
     /// on 1st Usage
     plugin.requestWriteExtStoragePermission();
     Pushy.listen(registrar.activeContext());
+    /// Listen for CLICK_ACTION_VALUE
+    registrar.addNewIntentListener(plugin);
   }
 
   /// Plugin constructor
@@ -76,7 +81,15 @@ public class FlutterPushyPlugin
   @Override
   public void onReceive(Context context, Intent intent) {
     String action = intent.getAction();
-    Log.d("flutter_pushy", action);
+
+    if (CLICK_ACTION_VALUE.equals(action)) {
+      Log.d(action, intent.getExtras().toString());
+      Log.d(action, "HELLO FROM NOTIFICATION INTENT CLICKED");
+      return;
+    }
+
+
+    Log.d(action, intent.getExtras().toString());
     channel.invokeMethod("onMessage", bundleToMap(intent.getExtras()));
 
     String title = "Notication";
@@ -87,6 +100,10 @@ public class FlutterPushyPlugin
 
     int NOTIFICATION_ID = 234;
     String CHANNEL_ID = "flutter_pushy";
+
+    Intent nIntent = new Intent(CLICK_ACTION_VALUE);
+    nIntent.putExtras(intent);
+    PendingIntent pIntent = PendingIntent.getActivity(context, 0, nIntent, 0);
     
     NotificationCompat.Builder builder = 
     new NotificationCompat.Builder(context)
@@ -97,8 +114,8 @@ public class FlutterPushyPlugin
     .setVibrate(new long[]{0, 400, 250, 400})
     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
     .setContentTitle(title)
-    .setContentText(message);
-    // .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, registrar.activity().class), PendingIntent.FLAG_UPDATE_CURRENT));
+    .setContentText(message)
+    .setContentIntent(pIntent);
 
     Pushy.setNotificationChannel(builder, context);
 
@@ -107,7 +124,16 @@ public class FlutterPushyPlugin
   }
 
 
-
+  @Override
+    public boolean onNewIntent(Intent intent) {
+      Log.d(intent.getAction(), "NEW INTENT FROM ONNEWINTENT");
+      // boolean res = sendMessageFromIntent("onResume", intent);
+      // if (res && registrar.activity() != null) {
+      //   registrar.activity().setIntent(intent);
+      // }
+      // return res;
+      return true;
+    }
 
 
 
