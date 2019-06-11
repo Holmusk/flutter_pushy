@@ -19,11 +19,19 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _fetchToken();
-    _pushy.configure(onMessage: (data) {
-      print('DATA: $data');
+    _pushy.configure(
+      onMessage: (data) {
+      print('DATA ON MESSAGE: $data');
       setState(() => _data = data.toString());
-    }, onToken: (token) {
+    },
+      onResume: (data) {
+        print('DATA ON RESUME: $data');
+        _isLoading = false;
+        setState(() => _data = data.toString());
+    },
+     onToken: (token) {
       print('found new Token: $token');
+      _isLoading = false;
       setState(() => _token = token);
     });
   }

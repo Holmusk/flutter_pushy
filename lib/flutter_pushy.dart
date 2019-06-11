@@ -28,6 +28,7 @@ class FlutterPushy {
   final MethodChannel _channel;
   final Platform      _platform;
   MessageHandler      _onMessage ;
+  MessageHandler      _onResume;
   TokenHandler        _onToken;
 
   /// Request permission to show notification
@@ -52,9 +53,10 @@ class FlutterPushy {
     => _channel.invokeMethod('fetchWriteExtStoragePermission');
 
   /// Sets up [MessageHandler] for incoming messages.
-  void configure({MessageHandler onMessage, TokenHandler onToken}) {
+  void configure({MessageHandler onMessage, MessageHandler onResume, TokenHandler onToken}) {
       _onToken    = onToken;
       _onMessage  = onMessage;
+      _onResume   = onResume;
       _channel.setMethodCallHandler(_handleMethod);
       _channel.invokeMethod('configure');
   }
@@ -71,6 +73,8 @@ class FlutterPushy {
     switch (call.method) {
       case 'onMessage':
         return _onMessage(call.arguments.cast<String, dynamic>());
+      case 'onResume':
+        return _onResume(call.arguments.cast<String, dynamic>());
       case 'onToken':
         return _onToken(call.arguments);
       default:

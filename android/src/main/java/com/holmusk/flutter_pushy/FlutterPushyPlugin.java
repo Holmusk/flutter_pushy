@@ -80,17 +80,13 @@ public class FlutterPushyPlugin
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    String action = intent.getAction();
 
-    if (CLICK_ACTION_VALUE.equals(action)) {
-      Log.d(action, intent.getExtras().toString());
-      Log.d(action, "HELLO FROM NOTIFICATION INTENT CLICKED");
+    // IF ACTION != pushy id then ignore
+    String action = intent.getAction();
+    if (PushReceiver.ACTION_REMOTE_MESSAGE.equals(action)) {
+      Log.d(action, "Received unkown intent action");
       return;
     }
-
-
-    Log.d(action, intent.getExtras().toString());
-    channel.invokeMethod("onMessage", bundleToMap(intent.getExtras()));
 
     String title = "Notication";
     String message = "Test Notification";
@@ -127,11 +123,7 @@ public class FlutterPushyPlugin
   @Override
     public boolean onNewIntent(Intent intent) {
       Log.d(intent.getAction(), "NEW INTENT FROM ONNEWINTENT");
-      // boolean res = sendMessageFromIntent("onResume", intent);
-      // if (res && registrar.activity() != null) {
-      //   registrar.activity().setIntent(intent);
-      // }
-      // return res;
+  
       return true;
     }
 
