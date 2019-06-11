@@ -6,6 +6,7 @@ import 'package:platform/platform.dart';
 
 typedef Future<dynamic> MessageHandler(Map<String, dynamic> message);
 typedef Future<String> TokenHandler(String token);
+typedef Future<Error> ErrorHandler(Error err);
 
 /// Implementation of pushy messaging API for flutter
 ///
@@ -29,6 +30,7 @@ class FlutterPushy {
   final Platform      _platform;
   MessageHandler      _onMessage ;
   MessageHandler      _onResume;
+  ErrorHandler        _onRegisterFail;
   TokenHandler        _onToken;
 
   /// Request permission to show notification
@@ -53,10 +55,15 @@ class FlutterPushy {
     => _channel.invokeMethod('fetchWriteExtStoragePermission');
 
   /// Sets up [MessageHandler] for incoming messages.
-  void configure({MessageHandler onMessage, MessageHandler onResume, TokenHandler onToken}) {
-      _onToken    = onToken;
-      _onMessage  = onMessage;
-      _onResume   = onResume;
+  void configure({
+    MessageHandler onMessage, 
+    MessageHandler onResume, 
+    TokenHandler onToken, 
+    ErrorHandler onRegisterFail}) {
+      _onToken        = onToken;
+      _onMessage      = onMessage;
+      _onResume       = onResume;
+      _onRegisterFail = _onRegisterFail;
       _channel.setMethodCallHandler(_handleMethod);
       _channel.invokeMethod('configure');
   }
@@ -75,6 +82,8 @@ class FlutterPushy {
         return _onMessage(call.arguments.cast<String, dynamic>());
       case 'onResume':
         return _onResume(call.arguments.cast<String, dynamic>());
+      case 'onRegisterFail':
+        return _onRegisterFail(call.arguments);
       case 'onToken':
         return _onToken(call.arguments);
       default:

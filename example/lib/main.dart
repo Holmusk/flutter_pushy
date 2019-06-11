@@ -10,67 +10,35 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isLoading = false;
   String _data;
   String _token = '';
   final _pushy = FlutterPushy();
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _fetchToken();
-    _pushy.configure(
-      onMessage: (data) {
+    _pushy.configure(onMessage: (data) {
       print('DATA ON MESSAGE: $data');
       setState(() => _data = data.toString());
+    }, onResume: (data) {
+      print('DATA ON RESUME: $data');
+      setState(() => _data = data.toString());
     },
-      onResume: (data) {
-        print('DATA ON RESUME: $data');
-        _isLoading = false;
-        setState(() => _data = data.toString());
-    },
-     onToken: (token) {
+     onRegisterFail: (err) {
+       print('FAILED TO REGISTER DEVICE ${err.toString()}');
+     }
+    , onToken: (token) {
       print('found new Token: $token');
-      _isLoading = false;
       setState(() => _token = token);
     });
   }
 
   void _fetchToken() async {
-    setState(() => _isLoading = true);
     final token = await FlutterPushy().getToken();
     print('Token: $token');
-    setState(() {
-      _token = token;
-      _isLoading = false;
-    });
-  }
-
-  void _registerDevice(BuildContext context) async {
-    setState(() => _isLoading = true);
-    try {
-      final token = await FlutterPushy().registerDevice();
-      print('Token: $token');
-      setState(() {
-        _token = token;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => SimpleDialog(
-              title: Text('Warning'),
-              children: <Widget>[
-                Text(
-                  'We are unable to register your device at the moment\n${e.toString()}',
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-      );
-    }
+    setState(() => _token = token);
   }
 
   @override
@@ -97,7 +65,7 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 RaisedButton(
                   child: Text('Register Device'),
-                  onPressed: () => _registerDevice(context),
+                  onPressed: () => _pushy.registerDevice(),
                 ),
                 SizedBox(height: 24.0),
                 _tokenWidget(context),
@@ -137,7 +105,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 RaisedButton(
                   child: Text('Register Device'),
-                  onPressed: () => _registerDevice(context),
+                  onPressed: () => _pushy.registerDevice(),
                 ),
                 SizedBox(height: 24.0),
                 _tokenWidget(context),
