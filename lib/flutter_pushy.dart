@@ -6,7 +6,7 @@ import 'package:platform/platform.dart';
 
 typedef Future<dynamic> MessageHandler(Map<String, dynamic> message);
 typedef Future<String> TokenHandler(String token);
-typedef Future<Error> ErrorHandler(Error err);
+typedef Future<int> ErrorHandler(int errorCode );
 
 /// Implementation of pushy messaging API for flutter
 ///
@@ -63,7 +63,7 @@ class FlutterPushy {
       _onToken        = onToken;
       _onMessage      = onMessage;
       _onResume       = onResume;
-      _onRegisterFail = _onRegisterFail;
+      _onRegisterFail = onRegisterFail;
       _channel.setMethodCallHandler(_handleMethod);
       _channel.invokeMethod('configure');
   }

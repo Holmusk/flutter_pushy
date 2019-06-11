@@ -1,6 +1,5 @@
 package com.holmusk.flutter_pushy;
 
-import me.pushy.sdk.Pushy;
 import android.content.Intent;
 import android.content.Context;
 import android.content.BroadcastReceiver;
@@ -10,12 +9,11 @@ import android.util.Log;
 
 public class PushReceiver extends BroadcastReceiver {
 
-    public static final String ACTION_REMOTE_MESSAGE =
-        "com.holmusk.plugin.pushymessaging.NOTIFICATION";
+    public static final String ACTION_REMOTE_MESSAGE = "com.holmusk.plugin.pushy_messaging.NOTIFICATION";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("Receive", intent.getExtras().toString());
+        Log.d("PushReceiver", intent.getAction());
         Intent newIntent = new Intent(ACTION_REMOTE_MESSAGE);
         newIntent.putExtras(intent);
         LocalBroadcastManager.getInstance(context).sendBroadcast(newIntent);

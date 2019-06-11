@@ -50,10 +50,7 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
                                   forKey: SwiftFlutterPushyPlugin.PUSHY_TOKEN_KEY)
         self._channel.invokeMethod("onToken", arguments: deviceToken)
       } else {
-        let err = FlutterError(code: "500",
-                               message: "Failed to register device to Pushy Server",
-                               details: error.debugDescription)
-        self._channel.invokeMethod("onRegisterFail", arguments: err)
+        self._channel.invokeMethod("onRegisterFail", arguments: 500)
       }
     })
   }

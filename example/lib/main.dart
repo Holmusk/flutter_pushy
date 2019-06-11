@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
       setState(() => _data = data.toString());
     },
      onRegisterFail: (err) {
-       print('FAILED TO REGISTER DEVICE ${err.toString()}');
+       print('FAILED TO REGISTER DEVICE WITH CODE: $err');
      }
     , onToken: (token) {
       print('found new Token: $token');
