@@ -32,8 +32,7 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
     case "registerDevice":
       registerPushy()
       result(nil)
-    case "configure": 
-      setNotificationHandler()
+    case "configure":
       result(nil)
     case "getToken":
       result(UserDefaults.standard.string(forKey: SwiftFlutterPushyPlugin.PUSHY_TOKEN_KEY))
@@ -67,7 +66,6 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
   /// Application delegates
   public func application(_ application: UIApplication,
                           didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
-    registerPushy()
     setNotificationHandler()
     return true
   }

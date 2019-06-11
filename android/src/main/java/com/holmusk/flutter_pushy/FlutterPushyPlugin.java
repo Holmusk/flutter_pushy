@@ -39,7 +39,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
-/** FlutterPushyPlugin */
+
 public class FlutterPushyPlugin
   extends BroadcastReceiver
   implements MethodCallHandler, NewIntentListener {
@@ -273,7 +273,8 @@ public class FlutterPushyPlugin
     Map<String, Object> map = new HashMap<>();
     Set<String> ks = extras.keySet();
     for (String key: ks) {
-      final String value = extras.getString(key);
+      final Object value = extras.get(key);
+      Log.d("DEBUG", "");
       if (value != null) {
         map.put(key, value);
       }
