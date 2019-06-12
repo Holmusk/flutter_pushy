@@ -1,5 +1,3 @@
-.DS_Store
-
 # Miscellaneous
 *.class
 *.log
@@ -17,7 +15,7 @@
 *.iws
 .idea/
 
-# Visual Studio Code related
+# Visual Studio Code relatedclear
 .vscode/
 
 # Flutter/Dart/Pub related
@@ -81,9 +79,7 @@
 .packages
 .pub/
 build/
-lib/generated/glyco/*
 ios/.generated/
-android/key.properties
 packages
 .flutter-plugins
 *.pb.dart
