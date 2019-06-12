@@ -4,14 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:platform/platform.dart';
 
+
+/// Event handler types
 typedef Future<dynamic> MessageHandler(Map<String, dynamic> message);
-typedef Future<String> TokenHandler(String token);
-typedef Future<int> ErrorHandler(int errorCode );
+typedef Future<String>  TokenHandler(String token);
+typedef Future<int>     ErrorHandler(int errorCode );
 
 /// Implementation of pushy messaging API for flutter
 ///
-/// Your app should call [requestNotificationPermissions] first
-/// then [registerDevice] to get a token
+/// Your app should call [registerDevice] to get a token
 /// then register handles dor incoming messages with [configure]
 ///
 class FlutterPushy {
@@ -33,28 +34,23 @@ class FlutterPushy {
   ErrorHandler        _onRegisterFail;
   TokenHandler        _onToken;
 
-  /// Request permission to show notification
-  /// Only fire in iOS
-  void requestNotificationPermissions() {  
-      if (!_platform.isIOS) { return; }
-      _channel.invokeMethod('requestPermissions');
-  }
-
-  /// Request write external storage permissions
-  /// Only fire in android
-  /// Necessary so pushy can reuse token 
-  /// To prevent multiple token for 1 device
-  void requestWriteExtStoragePermission() {
-    if (!_platform.isAndroid) { return; }
-    _channel.invokeMethod('requestWriteExtStoragePermission');
+  
+  /// Request write external storage permissions <Android only>
+  Future<void> requestWriteExtStoragePermission() async {
+    // This is mandatory to prevent multiple token issued for same device.
+    if (_platform.isAndroid) {
+      return _channel.invokeMethod('requestWriteExtStoragePermission');
+    }
   }
   
-  /// Get status of write external storage permission
-  /// for Android OS
-  Future<bool> get writeExtStoragePermission async 
-    => _channel.invokeMethod('fetchWriteExtStoragePermission');
-
-  /// Sets up [MessageHandler] for incoming messages.
+  /// Get status of write external storage permission <Android only>
+  Future<bool> get writeExtStoragePermission async {
+    // if not android return true
+    if (!_platform.isAndroid) { return true; }
+    return _channel.invokeMethod('fetchWriteExtStoragePermission');
+  }
+    
+  /// Sets up [Handlers] for incoming events.
   void configure({
     MessageHandler onMessage, 
     MessageHandler onResume, 
@@ -69,10 +65,9 @@ class FlutterPushy {
   }
 
   /// Register device to pushy server
-  /// and return a token string
-  Future<String> registerDevice() async => await _channel.invokeMethod('registerDevice');
+  Future<Null> registerDevice() async => await _channel.invokeMethod('registerDevice');
 
-  /// Returns locally stored pushy token
+  /// Returns locally stored [token] String
   Future<String> getToken() async => await _channel.invokeMethod('getToken');
   
   /// Handle callback from plugin itself
@@ -91,5 +86,3 @@ class FlutterPushy {
     }
   }
 }
-
-/// Dr Teng's iPhone 3ce0fe63729c5c533c7283

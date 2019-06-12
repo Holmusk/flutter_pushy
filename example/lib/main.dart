@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_pushy/flutter_pushy.dart';
 import 'package:platform/platform.dart';
 
@@ -17,62 +17,14 @@ class _MyAppState extends State<MyApp> {
   final _pushy = FlutterPushy();
   bool _isLoading = false;
 
-  FlutterLocalNotificationsPlugin _localPlugin = FlutterLocalNotificationsPlugin();
+  // FlutterLocalNotificationsPlugin _localPlugin = FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
     super.initState();
     _fetchToken();
     _configurePushy();
-    _configureLocalNotification();
-  }
-
-  void _configureLocalNotification() {
-    var initializationSettingsAndroid =
-    AndroidInitializationSettings('app_icon');
-    
-    var initializationSettingsIOS = IOSInitializationSettings(
-    onDidReceiveLocalNotification: _onDidReceiveLocalNotification);
-    
-    var initializationSettings = InitializationSettings(
-    initializationSettingsAndroid, initializationSettingsIOS);
-    
-    _localPlugin.initialize(initializationSettings,
-    onSelectNotification: _onSelectNotification);
-  }
-
-  Future<void> onDidReceiveLocalNotification(
-    int id,
-   String title, 
-   String body, 
-   String payload) async {
-     print('RECEIVE LOCAL NOTIF PAYLOAD : $payload');  
-  }
-  Future<void> _onDidReceiveLocalNotification(
-    int id,
-   String title, 
-   String body, 
-   String payload) async {
-     print('RECEIVE LOCAL NOTIF PAYLOAD : $payload');  
-  }
-
-  Future<void> _onSelectNotification(String payload) async {
-    print('HANDLE LOCAL NOTIFICATION SELECTION $payload');
-  }
-
-  Future<void> showNotification(String body, String payload) async {
-    print('SHOW LOCAL NOTIFICATION $body $payload');
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'com.holmusk.glycoleap.inAppLocal',
-        'inAppLocal',
-        'In App Local notification',
-        importance: Importance.Max,
-        priority: Priority.High);
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await _localPlugin.show(0, 'GLYCO', body, platformChannelSpecifics,
-        payload: payload);
+    // _configureLocalNotification();
   }
 
   void _configurePushy() {
@@ -80,9 +32,10 @@ class _MyAppState extends State<MyApp> {
       onMessage: (data) {
       print('DATA ON MESSAGE: $data');
       setState(() => _data = data.toString());
+      // Handle onMessage for iOS manually
       if (LocalPlatform().isIOS) {
-        final body = data['message'] ?? 'Notification';
-        showNotification(body, data.toString());
+        // final body = data['message'] ?? 'Notification';
+        // showNotification(body, data.toString());
       }
     }, onResume: (data) {
       print('DATA ON RESUME: $data');
@@ -191,4 +144,58 @@ class _MyAppState extends State<MyApp> {
             textAlign: TextAlign.center,
           );
   }
+
+
+  /* 
+  IOS ONLY!!!
+  Example of how to handle onMessage with Local Notification
+  
+  void _configureLocalNotification() {
+    var initializationSettingsAndroid =
+    AndroidInitializationSettings('app_icon');
+    
+    var initializationSettingsIOS = IOSInitializationSettings(
+    onDidReceiveLocalNotification: _onDidReceiveLocalNotification);
+    
+    var initializationSettings = InitializationSettings(
+    initializationSettingsAndroid, initializationSettingsIOS);
+    
+    _localPlugin.initialize(initializationSettings,
+    onSelectNotification: _onSelectNotification);
+  }
+
+  Future<void> onDidReceiveLocalNotification(
+    int id,
+   String title, 
+   String body, 
+   String payload) async {
+     print('RECEIVE LOCAL NOTIF PAYLOAD : $payload');  
+  }
+  Future<void> _onDidReceiveLocalNotification(
+    int id,
+   String title, 
+   String body, 
+   String payload) async {
+     print('RECEIVE LOCAL NOTIF PAYLOAD : $payload');  
+  }
+
+  Future<void> _onSelectNotification(String payload) async {
+    print('HANDLE LOCAL NOTIFICATION SELECTION $payload');
+  }
+
+  Future<void> showNotification(String body, String payload) async {
+    print('SHOW LOCAL NOTIFICATION $body $payload');
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'com.holmusk.glycoleap.inAppLocal',
+        'inAppLocal',
+        'In App Local notification',
+        importance: Importance.Max,
+        priority: Priority.High);
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await _localPlugin.show(0, 'GLYCO', body, platformChannelSpecifics,
+        payload: payload);
+  }
+  */
 }

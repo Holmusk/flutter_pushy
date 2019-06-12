@@ -1,3 +1,7 @@
-## 0.0.1
+## 1.0.0
 
-* TODO: Describe initial release.
+* Intial Flutter Pushy Pluggin.
+* Request for write external storage permission on Android.
+* Register device to pushy server and failure handling.
+* Handle and trigger a callback when push notification received.
+* Example project how to use this plugin.

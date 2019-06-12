@@ -94,8 +94,7 @@ public class FlutterPushyPlugin
         result.success(null);
         break;
       case "fetchWriteExtStoragePermission":
-        final boolean isGranted = isWriteExtStorageGranted();
-        result.success(isGranted);
+        result.success(isWriteExtStorageGranted());
         break;
       default:
         result.notImplemented();
