@@ -10,6 +10,7 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
   var _pushy                  : Pushy
   var _channel                : FlutterMethodChannel
   var _resumingFromBackground : Bool
+  var _resumingData           : Dictionary<AnyHashable, Any>?
   
   init(channel: FlutterMethodChannel) {
     _channel  = channel
@@ -17,7 +18,9 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
     _resumingFromBackground = false;
   }
   
+  /// =======================================================================================
   /// Pushy methods
+  /// =======================================================================================
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: FLUTTER_CHANNEL,
                                        binaryMessenger: registrar.messenger())
@@ -41,7 +44,9 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
     }
   }
   
+  /// =======================================================================================
   /// Private methods
+  /// =======================================================================================
   private func registerPushy() {
     _pushy.register({ [unowned self](error, deviceToken) in
       if error == nil {
@@ -57,13 +62,17 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
   private func setNotificationHandler() {
     _pushy.setNotificationHandler({ [unowned self](data, completionHandler) in
       self._resumingFromBackground ?
-        self._channel.invokeMethod("onResume", arguments: data) :
+        // set data to invoke onResume when app became active
+        self._resumingData = data :
+        // invoke onMessage directly when app is active
         self._channel.invokeMethod("onMessage", arguments: data)
       completionHandler(UIBackgroundFetchResult.newData)
     })
   }
   
+  /// =======================================================================================
   /// Application delegates
+  /// =======================================================================================
   public func application(_ application: UIApplication,
                           didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
     setNotificationHandler()
@@ -75,6 +84,11 @@ public class SwiftFlutterPushyPlugin: NSObject, FlutterPlugin {
     // Reset badge number once app goes to foreground
     application.applicationIconBadgeNumber = 1;
     application.applicationIconBadgeNumber = 0;
+    // If _resumingData is not nil then invoke onResume
+    if let data = _resumingData {
+      _channel.invokeMethod("onResume", arguments: data)
+      _resumingData = nil
+    }
   }
   
   public func applicationDidEnterBackground(_ application: UIApplication) {

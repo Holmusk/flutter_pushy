@@ -10,6 +10,7 @@ environment:
 dependencies:
   meta: ^1.1.6
   platform: ^2.0.0
+  flutter_local_notifications: ^0.7.1+1
   flutter:
     sdk: flutter
 
